@@ -9,27 +9,22 @@
     <title>WeatherDashboard</title>
 </head>
 <style>
+    .navbar-brand {
+        font-size: 38px;
+    }
 
-.navbar-brand {
-    font-size: 38px;
-}
+    .search-header {
+        font-size: 25px;
+        font-weight: bold;
+    }
 
-.search-header {
-    font-size: 25px;
-    font-weight: bold;
-}
+    .city-name {
+        font-size: 34px;
+    }
 
-.city-name {
-    font-size: 34px;
-}
-
-.forecast-date {
-    font-size: 20px;
-}
-
-
-
-
+    .forecast-date {
+        font-size: 20px;
+    }
 </style>
 
 <body>
@@ -50,7 +45,7 @@
                     </div>
                     <div id="history"></div>
                 </div>
-                
+
             </div>
             <div class="col-8">
                 <div class="row mr-0">
@@ -98,28 +93,74 @@
             </div>
         </div>
     </div>
-            <script>
-                //set up the initial conditions
-function InitPage() {
-    let inputEl = document.getElementById("city-input");
-    let SearchEl = document.getElementById("search-button");
-    let nameEl = document.getElementById("city-name");
-    let imgEl = document.getElementById("current-pic");
-    let tempEl = document.getElementById("temperature");
-    let humidityEl = document.getElementById("humidity");
-    let windEl = document.getElementById("wind-speed");
-    let uvEl = document.getElementById("UV-index");
-    let historyEl = docuemnt.getElementById("history");
-    let searchHistory = JSON.parse(localStorage.getItem("search")) || [];
-    console.log(searchHistory)
+    <script>
+        //set up the initial conditions
+        function InitPage() {
+            let inputEl = document.getElementById("city-input");
+            let SearchEl = document.getElementById("search-button");
+            let nameEl = document.getElementById("city-name");
+            let imgEl = document.getElementById("current-pic");
+            let tempEl = document.getElementById("temperature");
+            let humidityEl = document.getElementById("humidity");
+            let windEl = document.getElementById("wind-speed");
+            let uvEl = document.getElementById("UV-index");
+            let historyEl = document.getElementById("history");
+            let searchHistory = JSON.parse(localStorage.getItem("search")) || [];
+            console.log(searchHistory)
+
+        }
+
+
+        //read the city name typed by the user 
+
+        let ApiKey = "c9a9ed03a355403f4cb9a36e931c0b4a";
+        //execute a current condition get request from opendweather app
+        function getWeather(cityName) {
+            let queryUrl = "https://api.openweathermap.org/data/2.5/weather?q=" + cityName + "&appid=" + APIKey;
+            axios.get(queryURL)
+                .then(function (response) {
+                    console.log(response);
+                
+        // got info for using "date" objects from here https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
+    
+        let currentDate = new Date(response.data.dt*1000);
+        console.log(currentDate)
+        let day = currentDate.getDate();
+        let month = currentDate.getMonth() + 1;
+        let year = currentDate.getFullYear();
+        nameEl.innerHTML = response.data.name + " (" + month + "/" + day + "/" + year + ") ";
+        let weatherPic = response.data.weather[0].icon;
+        imgEl.setAttribute("src","https://openweathermap.org/img/wn/" + weatherPic + "@2x.png");
+        imgEl.setAttribute("alt",response.data.weather[0].description);
+        tempEl.innerHTML = "Temperature: " + k2f(response.data.main.temp) + " &#176F";
+        humidityEl.innerHTML = "Humidity: " + response.data.main.humidity + "%";
+        windEl.innerHTML = "Wind Speed: " + response.data.wind.speed + " MPH";
+        let lat = response.data.coord.lat;
+        let lon = response.data.coord.lon;
+        let UVQueryURL = "https://api.openweathermap.org/data/2.5/uvi/forecast?lat=" + lat + "&lon=" + lon + "&appid=" + APIKey + "&cnt=1";
+        axios.get(UVQueryURL)
+        .then(function(response){
+            let UVIndex = document.createElement("span");
+            UVIndex.setAttribute("class","badge badge-danger");
+            UVIndex.innerHTML = response.data[0].value;
+            uvEl.innerHTML = "UV Index: ";
+            uvEl.append(UVIndex);
+        });
 
 
 
-}
-            </script>
-            <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        });
 
             
+      
+        
+        }
+
+
+    </script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+
 </body>
 
 </html>
