@@ -93,15 +93,13 @@
             </div>
         </div>
     </div>
-    <script src="https://unpkg.com/d3@5.5.0/dist/d3.min.js"></script>
-    <script src="https://unpkg.com/d3@^5.5.0"></script>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-
+    
+    
     <script>
         //set up the initial conditions
         function InitPage() {
             let inputEl = document.getElementById("city-input");
-            let SearchEl = document.getElementById("search-button");
+            let searchEl = document.getElementById("search-button");
             let nameEl = document.getElementById("city-name");
             let imgEl = document.getElementById("current-pic");
             let tempEl = document.getElementById("temperature");
@@ -152,27 +150,27 @@
                         });
 
                     //using saved the city name, execute 5 day forecast get request form openweathermap api
-                        let cityId = response.data.id;
-                        let forecastQueryUrl = "https://api.openweathermap.org/data/2.5/forecast?id=" + cityID + "&appid=" + APIKey;
-                        axios.get(forecastQueryUrl)
-                        .then(function(response){
+                    let cityId = response.data.id;
+                    let forecastQueryUrl = "https://api.openweathermap.org/data/2.5/forecast?id=" + cityID + "&appid=" + APIKey;
+                    axios.get(forecastQueryUrl)
+                        .then(function (response) {
                             //Parse response to display forecast for next 5 days under current conditions
                             console.log(response);
                             let foreCast = document.querySelectorAll(".forecast");
-                            for (i=0; i<foreCast.length; i++) {
+                            for (i = 0; i < foreCast.length; i++) {
                                 foreCast[i].innerHTML = "";
-                                let forecastIndex = i*8+4;
-                                let forecastDate = new Date(response.data.list[forecastIndex].dt*1000);
+                                let forecastIndex = i * 8 + 4;
+                                let forecastDate = new Date(response.data.list[forecastIndex].dt * 1000);
                                 let forecastDay = forecastDate.getDate();
                                 let forecastMonth = forecastDate.getMonth() + 1;
                                 let forecastYear = forecastDate.getFullYear();
                                 let forecastDateEl = document.createElement("p");
-                                forecastDateEl.setAttribute("class","mt-3 mb-0 forecast-date");
+                                forecastDateEl.setAttribute("class", "mt-3 mb-0 forecast-date");
                                 forecastDateEl.innerHTML = forecastMonth + "/" + forecastDay + "/" + forecastYear;
                                 foreCast[i].append(forecastDateEl);
                                 let forecastWeather = document.createElement("img");
-                                forecastWeather.setAttribute("src","https://openweathermap.org/img/wn/" + response.data.list[forecastIndex].weather[0].icon + "@2x.png");
-                                forecastWeather.setAttribute("alt",response.data.list[forecastIndex].weather[0].description);
+                                forecastWeather.setAttribute("src", "https://openweathermap.org/img/wn/" + response.data.list[forecastIndex].weather[0].icon + "@2x.png");
+                                forecastWeather.setAttribute("alt", response.data.list[forecastIndex].weather[0].description);
                                 foreCast[i].append(forecastWeather);
                                 forecastTempEl = document.createElement("p");
                                 forecastTempEl.innerHTML = "temp: " + k2f(response.data.list[forecastIndex].main.temp) + " &#176F";
@@ -181,18 +179,25 @@
                                 forecastHumidityEl.innerHTML = "Humidity: " + response.data.list[forecastIndex].main.humidity + "%";
                                 foreCast[i].append(forecastHumidityEl);
                             }
-                            })
+                        })
 
                 });
 
         }
+//Uncaught ReferenceError: searchEl is not defined
+searchEl.addEventListener("click",function() {
+        let searchTerm = inputEl.value;
+        getWeather(searchTerm);
+        searchHistory.push(searchTerm);
+        localStorage.setItem("search",JSON.stringify(searchHistory));
+        renderSearchHistory();
+    });
 
-
-
+    
+    
     </script>
 
-
-
+ 
 </body>
 
 </html>
